@@ -52,7 +52,6 @@ const prodMethod = require('./models/productos')
 const msgMethod = require('./models/mensajes')
 const { HOSTNAME, SCHEMA, DATABASE, USER, PASSWORD, OPTIONS } = require("./DBconfig/Mongo")
 const homeRouter = require('./routes/routes')
-const fetch = require('node-fetch')
 
 const PORT = process.env.PORT || 8080
 
@@ -73,6 +72,10 @@ let productList=[]
 
 messagePool = msgMethod.cargarMensajes()
 productList = prodMethod.cargarProductos()
+// .then((data)=>{
+//   console.log('main.js -> productList: %o', data)
+// })
+
 
 // prodMethod.readData().then((info)=>{
 //   productList = info
@@ -97,11 +100,14 @@ io.on("connection", function (socket) {   //Mensaje que indica una conexión.
   console.log("Un cliente se ha conectado")
 
   socket.emit("messages", messagePool)
-  socket.emit('server:productList', productList)
 
-  socket.on('new-message', (data)=>{  // Mensaje que indica un nuevo mensaje de chat recibido
-      messagePool.push(data)
+  prodMethod.cargarProductos().then((listaProductos)=>{
+    socket.emit('server:productList', listaProductos)
+  })
+
+  socket.on('new-message', async (data)=>{  // Mensaje que indica un nuevo mensaje de chat recibido
       msgMethod.appendMessage(data)  // Almacenar mensaje en la base de datos
+      messagePool = await msgMethod.cargarMensajes()
       io.sockets.emit("messages", messagePool)
     })
 
@@ -111,12 +117,14 @@ io.on("connection", function (socket) {   //Mensaje que indica una conexión.
       
     //Desnormalización de datos de product
       
-    prodMethod.cargarProductos()
-    productList = prodMethod.data
-    console.log(productList)
+    prodMethod.cargarProductos().then((listaProductos)=>{
+
+      productList = prodMethod.data
+      console.log('main.js-> mensaje new-product: ' + listaProductos)
       
-      io.sockets.emit('server:productList', productList)
-    })    
+      io.sockets.emit('server:productList', listaProductos)
+    })
+  })    
     
 })
 

@@ -28,7 +28,8 @@ class Productos{
     }
     async cargarProductos(){
         try{ 
-            this.data = await this.model.find({})
+            const data = await this.model.find().lean()
+            return data
         }
         catch(err){
             console.log(err)

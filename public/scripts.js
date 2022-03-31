@@ -7,19 +7,19 @@ socket.on("messages", (message)=> {  //Mensaje para actualizar el listado de men
     let plantillaChat=document.getElementById('areaChat')
     if(plantillaChat){
         let compile = Handlebars.compile(plantillaChat.innerHTML)
-        let result = compile({message})
+        let result = compile(message)
         let msgPool=document.getElementById('messagePool')
         msgPool.innerHTML = result
     }
 })
 
 socket.on('server:productList', (items)=>{  //Mensaje para actualizar el listado de productos de la página index.htm
+   
     let plantillaProductos=document.getElementById('plantillaProductos')
     if( plantillaProductos){
-        console.log('server:productList ->items: ' , items)
-        let compile = Handlebars.compile(plantillaProductos.innerHTML)
-        let result = compile({items})
-        let listado=document.getElementById("listado")
+        let compile = Handlebars.compile(plantillaProductos.innerHTML )
+        let result = compile(items)
+        let listado=document.getElementById("listadoProductos")
         listado.innerHTML = result
     }
 })

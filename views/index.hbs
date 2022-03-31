@@ -2,7 +2,8 @@
 <html>
   <head>
     <link rel="stylesheet" href="/static/styles/styles.css" type="text/css" />
-    {{!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.css" /> --}}
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js" ></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.css" />
     <script src = "/socket.io/socket.io.js"></script>
      
   </head>
@@ -14,22 +15,26 @@
       </ul>
     </div>
   <p>Listado de productos</p>
-    <div type="text/x-handlerbars-template" id="plantillaProductos" >
-    <table id="listado">
-      <th>
-        <td>Producto</td>
-        <td>Precio</td>
-        <td>Foto</td>
-      </th>
-      {{#each listado}}
+    <div  id="listadoProductos"> 
+      <table  >
+      <thead>
         <tr>
-          <td>{{this.nombre}}</td>
-          <td>{{this.precio}}</td>
-          <td><img src={{this.foto}} alt=""></td>
-      {{/each}}
+          <th>Producto</th>
+          <th>Precio</th>
+          <th>Foto</th>
+        </tr>
+      </thead>
+        <tbody >
+         {{#each items}}
+          <tr>
+              <td>{{this.nombre}}</td>
+              <td>{{this.precio}}</td>
+              <td><img src={{this.foto}}></td>
+          {{/each}}
+          </tr>
+        </tbody>
       </table>
-  </div>
-
+    </div>
   <div >
   <p>Área de mensajes</p>
     <form onsubmit="addMessage(this)">
@@ -42,30 +47,32 @@
       <input type="text" id="mensaje" placeholder="Escriba su mensaje" />
       <button type="submit">Enviar</button>
     </form>
-    <table>
+    <table id="messagePool" >
       <thead>
-            <th>
-              <td>Nombre</td>
-              <td>Apellido</td>
-              <td>Alias</td>
-              <td>Avatar</td>
-            </th>
+            <tr>
+              <th>Avatar</th>
+              <th>Nombre</th>
+              <th>Apellido</th>
+              <th>Alias</th>
+              <th>Mensaje</th>
+            </tr>
       </thead>
-      <tbody id="areaChat" type="text/x-handlerbars-template">
-          {{#each message}}
+      <tbody>
+          {{#each mensajes}}
           <tr>
-              <td>{{this.nombre}}</td>
-              <td>{{this.apellido}}</td>
-              <td>{{this.alias}}</td>
-              <td>{{this.avatar}}</td>
-          </tr>
+              <td>{{this.author.avatar}}</td>
+              <td>{{this.author.nombre}}</td>
+              <td>{{this.author.apellido}}</td>
+              <td>{{this.author.alias}} ({{this.author.id}})</td>
+              <td>{{this.text}}</td>
           {{/each}}
+          </tr>
       </tbody>
     </table>
     <div id="messagePool" ></div>
   </div>
  </body> 
   <script src="https://cdn.jsdelivr.net/npm/normalizr@3.6.1/dist/normalizr.browser.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js" ></script>
+  
  <script src="/static/scripts.js"></script>
 </html>

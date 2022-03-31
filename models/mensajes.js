@@ -2,6 +2,7 @@ const knex = require('knex');
 const mongoose = require('mongoose')
 const fs = require('fs/promises');
 const path = require('path');
+const {schema, normalize} = require('normalizr')
 
 class Mensajes{
 
@@ -23,8 +24,23 @@ class Mensajes{
 
     async cargarMensajes(){
         try{ 
-            const msgPool = await this.model.find({})
-            return msgPool
+
+            const schemaAuthor = new schema.Entity('author',{},{idAttribute: 'email'})
+            const schemaMensaje = new schema.Entity('mensajes',{
+                author: schemaAuthor
+            })
+
+            const schemaData = new schema.Entity('data',{
+                mensajes: [schemaMensaje]
+            })
+
+            const mensajesEnBD = await this.model.find().lean()
+            
+            const MsgNormalizados = normalize({
+                id: 'mensajes',
+                mensajes: mensajesEnBD,
+                
+            }, schemaData)
         }
         catch(err){
             console.log(err)

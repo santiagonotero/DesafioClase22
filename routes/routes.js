@@ -1,15 +1,21 @@
 const {Router} = require('express')
 const faker = require("../Faker/index")
+const modelProductos = require('../models/productos')
+const modelMensajes = require('../models/mensajes')
 
 const router = Router()
 
-const Productos = require('../models/productos')
 
+router.get('/', async (req,res)=>{
 
-router.get('/', (req,res)=>{
+    const items = await modelProductos.cargarProductos()
+    const mensajes = await modelMensajes.cargarMensajes()
+   
+    res.render('index', {items: items, mensajes: mensajes})    
 
-    res.render('index',{})
 })
+
+
 
 router.get('/add', (req,res)=>{
 
@@ -17,13 +23,6 @@ router.get('/add', (req,res)=>{
 })
 
 router.post('/add', (req,res)=>{
-
-    //const {body} = req
-
-    //body.precio = JSON.parse(body.precio)
-    //console.log('router.post -> body: %o' , body)
-    //Productos.agregarProducto(body)
-
     res.redirect('/')
 })
 

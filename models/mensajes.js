@@ -25,7 +25,7 @@ class Mensajes{
     async cargarMensajes(){
         try{ 
 
-            const schemaAuthor = new schema.Entity('author',{},{idAttribute: 'email'})
+            const schemaAuthor = new schema.Entity('author',{},{idAttribute: 'id'}) //id contiene el email del autor 
             const schemaMensaje = new schema.Entity('mensajes',{
                 author: schemaAuthor
             })
@@ -34,13 +34,21 @@ class Mensajes{
                 mensajes: [schemaMensaje]
             })
 
-            const mensajesEnBD = await this.model.find().lean()
+            const mensajesEnBD = await this.model.find({}).lean()
             
             const MsgNormalizados = normalize({
                 id: 'mensajes',
-                mensajes: mensajesEnBD,
+                mensajes: mensajesEnBD.map((d)=>{
+                    return {
+                        author: d.author,
+                        text: d.text,
+                        id: d._id.toString()
+                    }
+                })
                 
             }, schemaData)
+            return MsgNormalizados
+
         }
         catch(err){
             console.log(err)

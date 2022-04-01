@@ -4,13 +4,35 @@ let socket = io.connect("http://localhost:8080", { forceNew: true });
 let date=new Date()
 
 socket.on("messages", (message)=> {  //Mensaje para actualizar el listado de mensajes de la página index.html
-    let plantillaChat=document.getElementById('areaChat')
+    
+    const schemaAuthor = new normalizr.schema.Entity('author',{},{idAttribute: 'id'})
+            const schemaMensaje = new normalizr.schema.Entity('mensajes',{
+                author: schemaAuthor
+            })
+
+            const schemaData = new normalizr.schema.Entity('data',{
+                mensajes: [schemaMensaje]
+            })
+    
+    const desnormalizado = normalizr.denormalize('mensajes', schemaData, message.entities)
+    const mensajes = desnormalizado.mensajes
+    
+    const compresion1 = JSON.stringify(message).length
+    const compresion2 = JSON.stringify(mensajes).length
+    const compresion = (compresion1/compresion2)*100
+
+    console.log('% de compresion: %d %' , compresion.toFixed(0))
+
+    console.log('mensajes: %o' ,mensajes)
+
+    let plantillaChat=document.getElementById('plantillaChat')
     if(plantillaChat){
         let compile = Handlebars.compile(plantillaChat.innerHTML)
-        let result = compile(message)
-        let msgPool=document.getElementById('messagePool')
-        msgPool.innerHTML = result
+        let result = compile({mensajes:mensajes, compresion:compresion.toFixed(0)})
+        let msgPool=document.getElementById('areaChat')
+        msgPool.innerHTML += result
     }
+
 })
 
 socket.on('server:productList', (items)=>{  //Mensaje para actualizar el listado de productos de la página index.htm
